@@ -51,6 +51,10 @@ const jobSchema = new Schema({
     created_at: {
         type: Date,
         default: Date.now
+    },
+    j_is_done: {
+        type: Boolean,
+        default: false
     }
 })
 
