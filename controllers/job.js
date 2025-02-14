@@ -197,3 +197,36 @@ export const uploadFiles = (req, res) => {
         res.status(200).json({ success: true, message: 'Files uploaded successfully' });
     });
 };
+
+export const getJobListByPilot = (req, res) => {
+    Job
+    .find({})
+    .populate([
+        {path: 'j_creator'}
+    ])
+    .then(jobs => {
+        return res.status(200).json({success: true, jobs});
+    })
+}
+
+export const getJobDetailByPilot = (req, res) => {
+    const { id } = req.params;
+
+    // Fetch job details by job ID
+    Job
+    .findById(id)
+    .populate([
+        {path: 'j_creator'}
+    ])
+    .then(job => {
+        if (!job) {
+            return res.status(404).json({ success: false, message: 'Job not found' });
+        }
+
+        // Return the fetched job details
+        res.status(200).json({ success: true, job });
+    })
+    .catch((err) => {
+        return res.status(500).json({ success: false, message: 'Failed to fetch job details' });
+    });
+}

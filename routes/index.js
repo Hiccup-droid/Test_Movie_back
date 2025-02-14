@@ -25,5 +25,7 @@ router.post('/client/jobs/:jobId/folders/:folderId/files', jobController.uploadF
 router.get('/pilot/profile/:userId', userController.getUserDetail);
 router.post('/pilot/profile/certs', userController.uploadCertFiles);
 // Routes for pilot action
+router.get('/pilot/jobs', jobController.getJobListByPilot);
+router.get('/pilot/jobs/:id', jobController.getJobDetailByPilot);
 
 export default router;
