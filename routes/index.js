@@ -9,7 +9,9 @@ const router = express.Router();
 // Routes for authentication
 router.post('/register', authController.register);                                                         // route for register
 router.post('/login', authController.login);                                                               // route for login
-router.get('/confirm/:token', authController.confirmEmail);                                                // route for confirming email
+router.get('/confirm/:token', authController.confirmEmail);     
+router.get('/user/cert/:userId', userController.getUserCertificateList);                                           // route for confirming email
+router.post('/user/cert/:userId', userController.uploadCertFiles);
 
 // Routes for client action
 router.post('/client/jobs', jobController.createJobByClient);                                                      // route for creating Job
