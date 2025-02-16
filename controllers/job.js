@@ -4,9 +4,13 @@ import path from 'path';
 import Job from '../models/job.js';
 import JobFile from '../models/job_file.js';
 import mongoose from 'mongoose';
+import { fileURLToPath } from 'url';
 /************************************
  * API functions for client Requests *
 *************************************/
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * @description Creates a new job, its default "Images" folder, and optionally inserts polygons if provided.
@@ -104,27 +108,34 @@ export const createFolderByJobId = async (req, res) => {
     }
 
     // Insert the new folder into the folders table
-    Job.findById(jobId, (err, job) => {
-        if(err) {
-            console.error('Failed to create folder:', err);
-            return res.status(500).json({ success: false, message: 'Failed to create folder' });
-        }
+    Job
+    .findById(jobId)
+    .then((job) => {
         job.j_folders.push({name: name});
 
-        job.save((err) => {
+        job
+        .save()
+        .then(() => {
+
+            return res.status(201).json({
+                success: true,
+                message: 'Successfully created.',
+            });
+        })
+        .catch((err) => {
             if (err) {
                 console.error('Failed to create folder:', err);
                 return res
                     .status(500)
                     .json({ success: false, message: 'Failed to create folder' });
             }
-
-            return res.status(201).json({
-                success: true,
-                message: 'Successfully created.',
-                folders: job.j_folders
-            });
         })
+    })
+    .catch(err => {
+        if(err) {
+            console.error('Failed to create folder:', err);
+            return res.status(500).json({ success: false, message: 'Failed to create folder' });
+        }
     })
 }
 
@@ -137,19 +148,20 @@ export const getFilesByFolderId = (req, res) => {
     const { folderId } = req.params;
 
     // Fetch all files for the given job and folder IDs
-    JobFile.find({jf_folder: folderId}, (err, files) => {
-        if (err) {
-            console.error('Database error fetching files:', err);
-            return res.status(500).json({ success: false, message: 'Database error occurred' });
-        }
-
+    JobFile
+    .find({jf_folder: folderId})
+    .then((files) => {
         if (!files || files.length === 0) {
-            console.warn(`No files found for folder ${folderId} in job ${jobId}`);
-            return res.status(200).json({ success: false, message: 'No files found for this folder' });
+            console.warn(`No files found for folder ${folderId}`);
+            return res.status(200).json({ success: false, message: 'No files found for this folder', files: [] });
         }
 
         console.log(`Files found for folder ${folderId}:`, files);
         res.status(200).json({ success: true, files });
+    })
+    .catch((err) => {
+        console.error('Database error fetching files:', err);
+        return res.status(500).json({ success: false, message: 'Database error occurred' });
     });
 }
 
@@ -158,8 +170,8 @@ export const getFilesByFolderId = (req, res) => {
  * @param req - Request object that contains job ID and folder ID in the parameters.
  * @param res - Response object to send back the result.
  */
-export const uploadFiles = (req, res) => {
-    const { folderId } = req.params;
+export const uploadJobFiles = (req, res) => {
+    const { folderId, jobId } = req.params;
 
     const uploadDir = path.join(__dirname, '../uploads/jobs');
     const form = formidable({ keepExtensions: true });
@@ -190,7 +202,7 @@ export const uploadFiles = (req, res) => {
             fs.writeFileSync(newPath, fs.readFileSync(oldPath));
 
             // Insert file record into the database
-            let newFile = new JobFile({jf_folder: folderId, jf_path: newPath})
+            let newFile = new JobFile({jf_folder: folderId, jf_path: file.newFilename})
             await newFile.save();
         })
 

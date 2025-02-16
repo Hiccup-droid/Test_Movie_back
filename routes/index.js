@@ -17,7 +17,7 @@ router.get('/client/jobs', jobController.getJobListByClient);                   
 router.get('/client/jobs/:id', jobController.getJobDetailByClient);                                                // route for getting detaied Job
 router.post('/client/jobs/:jobId/folders', jobController.createFolderByJobId);                             // route for creating Folders by Job Id 
 router.get('/client/jobs/:jobId/folders/:folderId/files', jobController.getFilesByFolderId);               // route for getting Files by Job Id and Folder Id
-router.post('/client/jobs/:jobId/folders/:folderId/files', jobController.uploadFiles);                     // route for uploading Files
+router.post('/client/jobs/:jobId/folders/:folderId/files', jobController.uploadJobFiles);                     // route for uploading Files
 
 // Routes for admin action
 router.get('/pilot/profile/:userId', userController.getUserDetail);
