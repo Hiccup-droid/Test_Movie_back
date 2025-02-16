@@ -212,7 +212,7 @@ export const uploadJobFiles = (req, res) => {
 
 export const getJobListByPilot = (req, res) => {
     Job
-    .find({})
+    .find({j_status: 'Approved'})
     .populate([
         {path: 'j_creator'}
     ])
@@ -241,4 +241,39 @@ export const getJobDetailByPilot = (req, res) => {
     .catch((err) => {
         return res.status(500).json({ success: false, message: 'Failed to fetch job details' });
     });
+}
+
+export const getJobListByAdmin =  (req, res) => {
+    const { status } = req.body;
+
+    let match = {};
+    match = status ? {...match, j_status: status} : match;
+
+    Job
+    .find(match)
+    .populate([
+        {path: 'j_creator'}
+    ])
+    .then(jobs => {
+        return res.status(200).json({jobs, success: true});
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({jobs: [], success: false});
+    })
+}
+
+export const updateJobStatusByAdmin = (req, res) => {
+    const { jobId } = req.params;
+    const { status } = req.body;
+
+    Job
+    .findByIdAndUpdate(jobId, {j_status: status})
+    .then(() => {
+        return res.status(200).json({success: true, message: "Updated successfully."});
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({status: false, message: "Update failed"});
+    })
 }

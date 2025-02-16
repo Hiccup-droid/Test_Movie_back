@@ -18,15 +18,17 @@ router.get('/client/jobs/:id', jobController.getJobDetailByClient);             
 router.post('/client/jobs/:jobId/folders', jobController.createFolderByJobId);                             // route for creating Folders by Job Id 
 router.get('/client/jobs/:jobId/folders/:folderId/files', jobController.getFilesByFolderId);               // route for getting Files by Job Id and Folder Id
 router.post('/client/jobs/:jobId/folders/:folderId/files', jobController.uploadJobFiles);                     // route for uploading Files
+router.get('/pilot/claims', claimController.getClaimRequestListByClient);
 
 // Routes for admin action
 router.get('/pilot/profile/:userId', userController.getUserDetail);
 router.post('/pilot/profile/certs', userController.uploadCertFiles);
+router.post('/admin/jobs', jobController.getJobListByAdmin);
+router.post('/admin/jobs/:jobId/status', jobController.updateJobStatusByAdmin);
 
 // Routes for pilot action
 router.get('/pilot/jobs', jobController.getJobListByPilot);
 router.get('/pilot/jobs/:id', jobController.getJobDetailByPilot);
-router.get('/pilot/claims', claimController.getClaimRequestListByClient);
 router.post('/pilot/claim/new', claimController.makeNewClaimRequestByPilot);
 // 
 
