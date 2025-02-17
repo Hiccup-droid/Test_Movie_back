@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';  
 import jwt from 'jsonwebtoken';  
 import User from '../models/user.js';
+import { sendMail } from '../utils/mail.js';
 
 /**
  * @description Registers a new user by validating input, hashing the password, and inserting the user into the database
@@ -12,7 +13,7 @@ export const register = (req, res) => {
     const { username, password, email, accountType } = req.body;                            // Extract user input from the request body
 
     // Check if the username already exists in the database
-    User.findOne({u_username: username}).then((user) => {
+    User.findOne({u_username: username}).then(async (user) => {
         if (user) {
             return res.status(400).json({ success: false, message: 'Username already exists' });          // Return error if username already exists
         }
@@ -30,7 +31,13 @@ export const register = (req, res) => {
             u_confrimation_token: confirmationToken
         });
 
-        newUser.save().then(() => {
+        newUser.save().then(async () => {
+            // await sendMail({
+            //     to: email,
+            //     from: "",
+            //     subject: "Confirm your email.",
+            //     text: `To confirm your email, use this code. ${confirmationToken}`
+            // })
             return res.status(201).json({ success: true, message: 'User registered successfully' });  // Return success message upon successful registration
         })
     });
@@ -81,11 +88,8 @@ export const confirmEmail = (req, res) => {
     const { token } = req.params;  // Extract the confirmation token from the request parameters
 
     // Look for the user with the corresponding confirmation token
-    User.findOne({confirmation_toekn: token}, (err, user) => {
-        if (err) {
-            return res.status(500).json({ success: false, message: 'Database error' });  // Handle database errors
-        }
-
+    User.findOne({confirmation_token: token})
+    .then((user) => {
         if (!user) {
             return res.status(400).json({ success: false, message: 'Invalid token' });  // Return error if the token is invalid
         }
@@ -105,5 +109,8 @@ export const confirmEmail = (req, res) => {
                 res.status(200).json({ success: true, message: 'Account successfully confirmed' });
             }
         );
-    });
+    })
+    .catch(err => {
+        return res.status(500).json({ success: false, message: 'Database error' });  // Handle database errors
+    })
 };

@@ -3,8 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import Job from '../models/job.js';
 import JobFile from '../models/job_file.js';
-import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
+import User from '../models/user.js';
+import { sendMail } from '../utils/mail.js';
 /************************************
  * API functions for client Requests *
 *************************************/
@@ -269,7 +270,16 @@ export const updateJobStatusByAdmin = (req, res) => {
 
     Job
     .findByIdAndUpdate(jobId, {j_status: status})
-    .then(() => {
+    .then( async (job) => {
+        // if(status === "Approved") {
+        //     let user = await User.findById(job.j_creator);
+        //     await sendMail({
+        //         from: "",
+        //         to: user.u_email,
+        //         subject: "Update on your Job Post",
+        //         text: `Your job "${job.j_title}" has been approved.`
+        //     })
+        // }
         return res.status(200).json({success: true, message: "Updated successfully."});
     })
     .catch(err => {
