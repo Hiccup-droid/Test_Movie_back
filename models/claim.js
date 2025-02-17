@@ -24,6 +24,11 @@ const claimSchema = new Schema({
         required: true,
         ref: "app_user"
     },
+    c_done: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     created_at: {
         type: Date,
         default: Date.now

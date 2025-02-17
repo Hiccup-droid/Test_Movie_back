@@ -277,3 +277,20 @@ export const updateJobStatusByAdmin = (req, res) => {
         return res.status(500).json({status: false, message: "Update failed"});
     })
 }
+
+export const getJobListInProgressByClient = (req, res) => {
+    const { userId } = req.params;
+
+    Job
+    .find({j_creator: userId, j_progress: 'doing'})
+    .populate([
+        {path: 'j_developers'}
+    ])
+    .then(jobs => {
+        return res.status(200).json({success: true, jobs});
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({success: false, jobs: []});
+    })
+}

@@ -52,9 +52,9 @@ const jobSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    j_is_done: {
-        type: Boolean,
-        default: false
+    j_progress: {
+        type: String,
+        default: "waiting" // waiting, doing, done
     }
 })
 
