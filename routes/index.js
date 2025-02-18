@@ -26,12 +26,13 @@ router.get('/client/jobs/isdoing/:userId', jobController.getJobListInProgressByC
 
 // Routes for admin action
 router.get('/pilot/profile/:userId', userController.getUserDetail);
+router.post('/pilot/profile', userController.updatePilotProfile);
 router.post('/pilot/profile/certs', userController.uploadCertFiles);
 router.post('/admin/jobs', jobController.getJobListByAdmin);
 router.post('/admin/jobs/:jobId/status', jobController.updateJobStatusByAdmin);
 
 // Routes for pilot action
-router.get('/pilot/jobs', jobController.getJobListByPilot);
+router.get('/pilot/jobs/:pilotId', jobController.getJobListByPilot);
 router.get('/pilot/jobs/:id', jobController.getJobDetailByPilot);
 router.post('/pilot/claim/new', claimController.makeNewClaimRequestByPilot);
 // 

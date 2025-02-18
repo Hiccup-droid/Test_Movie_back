@@ -5,6 +5,7 @@ import Job from '../models/job.js';
 import JobFile from '../models/job_file.js';
 import { fileURLToPath } from 'url';
 import User from '../models/user.js';
+import axios from 'axios';
 import { sendMail } from '../utils/mail.js';
 /************************************
  * API functions for client Requests *
@@ -211,14 +212,66 @@ export const uploadJobFiles = (req, res) => {
     });
 };
 
-export const getJobListByPilot = (req, res) => {
+
+async function geocodeLocation(address) {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?country=us&access_token=${process.env.MAPBOX_TOKEN}`;
+  
+    try {
+      const response = await axios.get(url);
+      const features = response.data.features;
+      if (features.length > 0) {
+        const [longitude, latitude] = features[0].geometry.coordinates;
+        return { lat: latitude, lon: longitude };
+      } else {
+        throw new Error('Location not found');
+      }
+    } catch (error) {
+      console.error('Error geocoding location:', error);
+      return null;
+    }
+  }
+  
+  // Haversine formula to calculate distance between two points (in kilometers)
+  function toRad(degrees) {
+    return degrees * (Math.PI / 180);
+  }
+  
+  function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+  
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+    return R * c; // Distance in kilometers
+  }
+
+
+export const getJobListByPilot = async (req, res) => {
+    let pilot = await User.findById(req.params.pilotId);
+
+    const centerCoords = await geocodeLocation(pilot.u_address);
+    
+
     Job
     .find({j_status: 'Approved'})
     .populate([
         {path: 'j_creator'}
     ])
     .then(jobs => {
-        return res.status(200).json({success: true, jobs});
+        let result = jobs.filter(async job => {
+            let placeCoords = await geocodeLocation(job.j_address);
+            let distance = haversine(centerCoords.lat, centerCoords.lon, placeCoords.lat, placeCoords.lon);
+
+            return distance <= pilot.u_operation_radius;
+        })
+        
+        return res.status(200).json({success: true, jobs: result});
     })
 }
 

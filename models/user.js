@@ -28,6 +28,12 @@ const userSchema = new Schema({
             required: true
         }
     }],
+    u_address: {
+        type: String,
+    },
+    u_operation_radius: {
+        type: Number
+    },
     u_confirmed: {
         type: Boolean,
         default: false // 'false', 'true'
