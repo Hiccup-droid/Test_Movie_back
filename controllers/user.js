@@ -97,3 +97,15 @@ export const updatePilotProfile = (req, res) => {
             return res.status(500).json({ success: false, user: {}, message: "Update Failed" });
         })
 }
+
+export const getPilotListByHomePage = (req, res) => {
+    User
+    .find({u_account_type: 'pilot'})
+    .then(data => {
+        return res.status(200).send(data);
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).send([]);
+    })
+}

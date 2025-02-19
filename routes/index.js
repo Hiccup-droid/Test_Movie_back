@@ -12,6 +12,7 @@ router.post('/login', authController.login);                                    
 router.get('/confirm/:token', authController.confirmEmail);     
 router.get('/user/cert/:userId', userController.getUserCertificateList);                                           // route for confirming email
 router.post('/user/cert/:userId', userController.uploadCertFiles);
+router.get('/user/pilots', userController.getPilotListByHomePage);
 
 // Routes for client action
 router.post('/client/jobs', jobController.createJobByClient);                                                      // route for creating Job
