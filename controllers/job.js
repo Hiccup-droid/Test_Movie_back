@@ -20,6 +20,8 @@ const __dirname = path.dirname(__filename);
  * @param res - Response object to send back the result.
  */
 export const createJobByClient = (req, res) => {
+    
+
     const { title, description, budget, address, geometry, userId } = req.body;
 
     // Insert new job record into the jobs table
@@ -78,6 +80,8 @@ export const getJobDetailByClient = (req, res) => {
  * @param res - Response object to send back the list of jobs.
  */
 export const getJobListByClient = (req, res) => {
+    console.log(">>>>>>>>>",  req.user._id);
+
     const userId = req.query.userId;
 
     // Fetch all jobs by user ID
