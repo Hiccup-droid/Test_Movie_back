@@ -6,7 +6,7 @@ const MovieSchema = new Schema({
         required: true
     },
     publish_year: {
-        type: String,
+        type: Number,
         required: true
     },
     img_url: {
